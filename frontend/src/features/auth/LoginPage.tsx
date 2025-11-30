@@ -19,7 +19,7 @@ export const LoginPage = () => {
     try {
       await api.login({ email, password });
       navigate('/notes');
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {

@@ -31,7 +31,7 @@ export const RegisterPage = () => {
     try {
       await api.register({ email, password });
       navigate('/notes');
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {

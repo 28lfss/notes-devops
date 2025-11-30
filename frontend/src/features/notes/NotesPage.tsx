@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, ApiError, Note } from '../../api/client';
+import { api, ApiError } from '../../api/client';
+import type { Note } from '../../api/types';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Textarea } from '../../components/Textarea';
@@ -29,7 +30,7 @@ export const NotesPage = () => {
       setLoading(true);
       const fetchedNotes = await api.getNotes();
       setNotes(fetchedNotes);
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 401) {
         navigate('/login');
       } else {
@@ -51,7 +52,7 @@ export const NotesPage = () => {
       setContent('');
       setShowForm(false);
       await loadNotes();
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
@@ -70,7 +71,7 @@ export const NotesPage = () => {
     try {
       await api.deleteNote(id);
       await loadNotes();
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
