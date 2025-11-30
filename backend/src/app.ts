@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import routes from './controllers/routes';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app: Express = express();
 
@@ -22,11 +23,8 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: 'Internal server error' });
-});
+// Error handler (must be last)
+app.use(errorHandler);
 
 export default app;
 
