@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { Button } from './Button';
 
@@ -8,12 +8,11 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  const navigate = useNavigate();
   const isAuthenticated = api.isAuthenticated();
 
   const handleLogout = () => {
     api.logout();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   return (

@@ -1,8 +1,9 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { api, ApiError } from '../../api/client';
+import { api } from '../../api/client';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { ErrorMessage } from '../../components/ErrorMessage';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
@@ -32,11 +33,7 @@ export const RegisterPage = () => {
       await api.register({ email, password });
       navigate('/notes');
     } catch (err: unknown) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -47,11 +44,7 @@ export const RegisterPage = () => {
       <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8">
         <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
         <form onSubmit={handleSubmit}>
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
+          <ErrorMessage message={error} />
           <Input
             type="email"
             label="Email"

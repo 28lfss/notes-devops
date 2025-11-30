@@ -1,13 +1,15 @@
-import { useState, useEffect, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api, ApiError } from '../../api/client';
+import { useState, useEffect, FormEvent, useCallback } from 'react';
+import { api } from '../../api/client';
 import type { Note } from '../../api/types';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Textarea } from '../../components/Textarea';
+import { ErrorMessage } from '../../components/ErrorMessage';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { useAuth } from '../../hooks/useAuth';
 
 export const NotesPage = () => {
-  const navigate = useNavigate();
+  useAuth(); // Redirects to login if not authenticated
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,30 +18,22 @@ export const NotesPage = () => {
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!api.isAuthenticated()) {
-      navigate('/login');
-      return;
-    }
-
-    loadNotes();
-  }, [navigate]);
-
-  const loadNotes = async () => {
+  const loadNotes = useCallback(async () => {
     try {
       setLoading(true);
+      setError('');
       const fetchedNotes = await api.getNotes();
       setNotes(fetchedNotes);
     } catch (err: unknown) {
-      if (err instanceof ApiError && err.status === 401) {
-        navigate('/login');
-      } else {
-        setError('Failed to load notes');
-      }
+      setError(err instanceof Error ? err.message : 'Failed to load notes');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadNotes();
+  }, [loadNotes]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,11 +47,7 @@ export const NotesPage = () => {
       setShowForm(false);
       await loadNotes();
     } catch (err: unknown) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('Failed to create note');
-      }
+      setError(err instanceof Error ? err.message : 'Failed to create note');
     } finally {
       setSubmitting(false);
     }
@@ -69,23 +59,16 @@ export const NotesPage = () => {
     }
 
     try {
+      setError('');
       await api.deleteNote(id);
       await loadNotes();
     } catch (err: unknown) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('Failed to delete note');
-      }
+      setError(err instanceof Error ? err.message : 'Failed to delete note');
     }
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">Loading notes...</p>
-      </div>
-    );
+    return <LoadingSpinner message="Loading notes..." />;
   }
 
   return (
@@ -97,11 +80,7 @@ export const NotesPage = () => {
         </Button>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
-      )}
+      <ErrorMessage message={error} />
 
       {showForm && (
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
