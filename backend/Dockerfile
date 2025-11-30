@@ -5,6 +5,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Install OpenSSL and other required libraries for Prisma
+RUN apk add --no-cache openssl1.1-compat libc6-compat
+
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -26,6 +29,9 @@ RUN npm run build
 FROM node:18-alpine
 
 WORKDIR /app
+
+# Install OpenSSL and other required libraries for Prisma
+RUN apk add --no-cache openssl1.1-compat libc6-compat
 
 # Install Prisma CLI globally for migrations
 RUN npm install -g prisma
