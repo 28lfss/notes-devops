@@ -126,6 +126,55 @@ The architecture is designed for easy testing:
 4. **Logging**: Consider using a proper logging library (Winston, Pino)
 5. **Configuration Management**: Centralize environment variable handling
 
+## API Endpoints
+
+### Authentication (Public)
+- `POST /api/auth/register` - Register a new user
+  - Body: `{ email: string, password: string }`
+  - Returns: `{ user: User, token: string }`
+- `POST /api/auth/login` - Login user
+  - Body: `{ email: string, password: string }`
+  - Returns: `{ user: User, token: string }`
+
+### Notes (Protected - Requires Authentication)
+- `GET /api/notes` - Get all user's notes
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: `Note[]`
+- `GET /api/notes/:id` - Get a specific note
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: `Note`
+- `POST /api/notes` - Create a new note
+  - Headers: `Authorization: Bearer <token>`
+  - Body: `{ title: string, content: string }`
+  - Returns: `Note`
+- `PUT /api/notes/:id` - Update a note
+  - Headers: `Authorization: Bearer <token>`
+  - Body: `{ title?: string, content?: string }`
+  - Returns: `Note`
+- `DELETE /api/notes/:id` - Delete a note
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: `204 No Content`
+
+### Health Check
+- `GET /api/health` - Health check endpoint
+  - Returns: `{ status: 'ok' }`
+
+## Error Responses
+
+All endpoints return consistent error responses:
+```json
+{
+  "error": "Error message",
+  "statusCode": 400
+}
+```
+
+Common status codes:
+- `400` - Bad Request (Validation errors)
+- `401` - Unauthorized (Invalid or missing token)
+- `404` - Not Found (Resource not found)
+- `500` - Internal Server Error
+
 ## Current Status
 
 ✅ **Architecture**: Clean and well-organized
@@ -133,4 +182,5 @@ The architecture is designed for easy testing:
 ✅ **Maintainability**: Easy to understand and modify
 ✅ **Testability**: Designed for easy testing
 ✅ **Scalability**: Can grow without major refactoring
+✅ **API Documentation**: Endpoints documented above
 
