@@ -6,7 +6,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Install OpenSSL and other required libraries for Prisma
-RUN apk add --no-cache openssl1.1-compat libc6-compat
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 
 # Copy package files
 COPY package*.json ./
@@ -31,21 +31,24 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Install OpenSSL and other required libraries for Prisma
-RUN apk add --no-cache openssl1.1-compat libc6-compat
-
-# Install Prisma CLI globally for migrations
-RUN npm install -g prisma
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm install --production
+# Install all dependencies (including dev dependencies for Prisma)
+# Prisma needs to be available to generate the client
+RUN npm install
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Regenerate Prisma Client in production stage with the correct version
+RUN npx prisma generate
+
+# Remove dev dependencies after generating Prisma Client
+RUN npm prune --production
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh ./
