@@ -23,7 +23,12 @@ done
 echo "Database is ready!"
 
 echo "Running database migrations..."
-npx prisma migrate deploy || npx prisma db push
+if [ -d "prisma/migrations" ] && [ "$(ls -A prisma/migrations 2>/dev/null)" ]; then
+  npx prisma migrate deploy
+else
+  echo "No migrations found, using db push for development..."
+  npx prisma db push
+fi
 
 echo "Starting application..."
 
