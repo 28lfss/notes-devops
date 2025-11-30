@@ -62,6 +62,15 @@ const fetchWithAuth = async (
   return response;
 };
 
+const handleApiError = async (response: Response): Promise<never> => {
+  const errorData = await response.json().catch(() => ({ error: response.statusText }));
+  throw new ApiError(
+    errorData.error || response.statusText,
+    response.status,
+    response.statusText
+  );
+};
+
 export const api = {
   // Auth
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -72,12 +81,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: response.statusText }));
-      throw new ApiError(
-        errorData.error || response.statusText,
-        response.status,
-        response.statusText
-      );
+      await handleApiError(response);
     }
 
     const data: AuthResponse = await response.json();
@@ -93,12 +97,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: response.statusText }));
-      throw new ApiError(
-        errorData.error || response.statusText,
-        response.status,
-        response.statusText
-      );
+      await handleApiError(response);
     }
 
     const data: AuthResponse = await response.json();
