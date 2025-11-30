@@ -4,13 +4,17 @@ A fullstack notes application with DevOps best practices.
 
 ## Architecture
 
-- **Backend**: Express.js + TypeScript + Prisma ORM
-- **Frontend**: React + Vite + TypeScript
+- **Backend**: Express.js + TypeScript + Prisma ORM (Clean Architecture)
+- **Frontend**: React + Vite + TypeScript (Feature-Based Architecture)
 - **Database**: PostgreSQL
 - **Infrastructure**: Docker + Docker Compose
 - **Monitoring**: Zabbix + Grafana
 - **Cloud**: AWS EC2
 - **CI/CD**: GitHub Actions
+
+For detailed architecture documentation, see:
+- [Backend Architecture](./backend/ARCHITECTURE.md)
+- [Frontend Architecture](./frontend/ARCHITECTURE.md)
 
 ## Project Structure
 
