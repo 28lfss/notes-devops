@@ -44,8 +44,10 @@ notes-devops/
 
 3. Start all services:
    ```bash
-   docker-compose -f infra/docker-compose.dev.yml up --build
+   docker compose -f infra/docker-compose.dev.yml up --build
    ```
+   
+   **Note**: If you're using Docker Compose v2 (default in newer Docker versions), use `docker compose` (without hyphen). For older versions, use `docker-compose`.
 
 4. Access the application:
    - Frontend: http://localhost:8080
