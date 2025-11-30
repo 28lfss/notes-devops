@@ -25,13 +25,11 @@ export class NoteService {
   }
 
   async updateNote(id: string, userId: string, input: UpdateNoteInput): Promise<Note> {
-    // Verify note exists and belongs to user
     await this.getNoteById(id, userId);
     return this.noteRepository.update(id, input);
   }
 
   async deleteNote(id: string, userId: string): Promise<void> {
-    // Verify note exists and belongs to user
     await this.getNoteById(id, userId);
     await this.noteRepository.delete(id);
   }

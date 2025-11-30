@@ -15,7 +15,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle unexpected errors
   console.error('Unexpected error:', err);
   res.status(500).json({
     error: 'Internal server error',

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '../domain/errors';
 
-// Common validation helpers
 const validateString = (value: unknown, fieldName: string): string => {
   if (typeof value !== 'string') {
     throw new ValidationError(`${fieldName} must be a string`);
@@ -75,7 +74,6 @@ export const validateCreateNote = (req: Request, res: Response, next: NextFuncti
 export const validateUpdateNote = (req: Request, res: Response, next: NextFunction): void => {
   const { title, content } = req.body;
 
-  // Both fields are optional for update, but if provided, must be valid
   if (title !== undefined) {
     validateNonEmptyString(title, 'Title');
   }
@@ -84,7 +82,6 @@ export const validateUpdateNote = (req: Request, res: Response, next: NextFuncti
     validateNonEmptyString(content, 'Content');
   }
 
-  // At least one field must be provided
   if (title === undefined && content === undefined) {
     throw new ValidationError('At least one field (title or content) must be provided for update');
   }

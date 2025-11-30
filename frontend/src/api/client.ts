@@ -72,7 +72,6 @@ const handleApiError = async (response: Response): Promise<never> => {
 };
 
 export const api = {
-  // Auth
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -113,7 +112,6 @@ export const api = {
     return getAuthToken() !== null;
   },
 
-  // Notes
   async getNotes(): Promise<Note[]> {
     const response = await fetchWithAuth('/notes');
     return response.json();

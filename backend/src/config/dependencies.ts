@@ -5,11 +5,6 @@ import { NoteService } from '../services/NoteService';
 import { AuthController } from '../controllers/authController';
 import { NoteController } from '../controllers/noteController';
 
-/**
- * Dependency Factory
- * Centralizes dependency creation for consistency across the application
- * In a larger app, consider using a DI container (e.g., Inversify, TSyringe)
- */
 class Dependencies {
   private static _userRepository: UserRepository | null = null;
   private static _noteRepository: NoteRepository | null = null;

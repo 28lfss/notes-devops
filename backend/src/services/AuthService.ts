@@ -16,25 +16,20 @@ export class AuthService {
   }
 
   async register(input: CreateUserInput): Promise<{ user: UserWithoutPassword; token: string }> {
-    // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
       throw new ValidationError('User with this email already exists');
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(input.password, 10);
 
-    // Create user
     const user = await this.userRepository.create({
       email: input.email,
       passwordHash,
     });
 
-    // Generate JWT token
     const token = this.generateToken(user.id);
 
-    // Return user without password
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
       user: userWithoutPassword as UserWithoutPassword,
@@ -43,22 +38,18 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<{ user: UserWithoutPassword; token: string }> {
-    // Find user by email
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new UnauthorizedError('Invalid email or password');
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       throw new UnauthorizedError('Invalid email or password');
     }
 
-    // Generate JWT token
     const token = this.generateToken(user.id);
 
-    // Return user without password
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
       user: userWithoutPassword as UserWithoutPassword,
