@@ -25,15 +25,54 @@ notes-devops/
 
 ### Prerequisites
 
-- Node.js 18+
 - Docker & Docker Compose
-- PostgreSQL (or use Docker)
+- (Optional) Node.js 18+ for local development without Docker
 
-### Local Development
+### Running with Docker
 
-1. Clone the repository
-2. Set up environment variables
-3. Run `docker-compose up` (when available)
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd notes-devops
+   ```
+
+2. Set up environment variables (optional, defaults provided):
+   ```bash
+   # Create .env file in root directory
+   JWT_SECRET=your-secret-key-change-in-production
+   ```
+
+3. Start all services:
+   ```bash
+   docker-compose -f infra/docker-compose.dev.yml up --build
+   ```
+
+4. Access the application:
+   - Frontend: http://localhost:8080
+   - Backend API: http://localhost:8080/api
+   - PostgreSQL: localhost:5432
+
+### Services
+
+- **Frontend**: React app served via nginx on port 8080
+- **Backend**: Express API on port 3000 (internal, proxied via nginx)
+- **PostgreSQL**: Database on port 5432
+
+### Development
+
+To run services individually:
+
+```bash
+# Backend only
+cd backend
+npm install
+npm run dev
+
+# Frontend only
+cd frontend
+npm install
+npm run dev
+```
 
 ## Branches
 
