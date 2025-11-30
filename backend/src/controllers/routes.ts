@@ -1,23 +1,18 @@
 import { Router } from 'express';
-import { AuthController } from './authController';
-import { NoteController } from './noteController';
-import { AuthService } from '../services/AuthService';
-import { NoteService } from '../services/NoteService';
-import { UserRepository } from '../repositories/UserRepository';
-import { NoteRepository } from '../repositories/NoteRepository';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { validateRegister, validateLogin, validateCreateNote } from '../middlewares/validation';
+import {
+  validateRegister,
+  validateLogin,
+  validateCreateNote,
+  validateUpdateNote,
+} from '../middlewares/validation';
+import Dependencies from '../config/dependencies';
 
 const router = Router();
 
-// Initialize dependencies (in a real app, use a DI container)
-const userRepository = new UserRepository();
-const noteRepository = new NoteRepository();
-const authService = new AuthService(userRepository);
-const noteService = new NoteService(noteRepository);
-
-const authController = new AuthController(authService);
-const noteController = new NoteController(noteService);
+// Get controllers from dependency factory
+const authController = Dependencies.getAuthController();
+const noteController = Dependencies.getNoteController();
 
 // Auth routes (public)
 router.post('/auth/register', validateRegister, authController.register);
@@ -27,8 +22,13 @@ router.post('/auth/login', validateLogin, authController.login);
 router.get('/notes', authMiddleware, noteController.listNotes);
 router.get('/notes/:id', authMiddleware, noteController.getNote);
 router.post('/notes', authMiddleware, validateCreateNote, noteController.createNote);
-router.put('/notes/:id', authMiddleware, noteController.updateNote);
+router.put('/notes/:id', authMiddleware, validateUpdateNote, noteController.updateNote);
 router.delete('/notes/:id', authMiddleware, noteController.deleteNote);
+
+// Health check endpoint
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 export default router;
 

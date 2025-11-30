@@ -1,6 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '../domain/errors';
 
+// Common validation helpers
+const validateString = (value: unknown, fieldName: string): string => {
+  if (typeof value !== 'string') {
+    throw new ValidationError(`${fieldName} must be a string`);
+  }
+  return value;
+};
+
+const validateNonEmptyString = (value: unknown, fieldName: string): string => {
+  const str = validateString(value, fieldName);
+  if (str.trim().length === 0) {
+    throw new ValidationError(`${fieldName} cannot be empty`);
+  }
+  return str;
+};
+
+const validateEmail = (email: string): void => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ValidationError('Invalid email format');
+  }
+};
+
+const validatePassword = (password: string, minLength: number = 6): void => {
+  if (password.length < minLength) {
+    throw new ValidationError(`Password must be at least ${minLength} characters long`);
+  }
+};
+
 export const validateRegister = (req: Request, res: Response, next: NextFunction): void => {
   const { email, password } = req.body;
 
@@ -8,18 +37,11 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
     throw new ValidationError('Email and password are required');
   }
 
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    throw new ValidationError('Email and password must be strings');
-  }
+  const emailStr = validateNonEmptyString(email, 'Email');
+  const passwordStr = validateString(password, 'Password');
 
-  if (password.length < 6) {
-    throw new ValidationError('Password must be at least 6 characters long');
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    throw new ValidationError('Invalid email format');
-  }
+  validateEmail(emailStr);
+  validatePassword(passwordStr);
 
   next();
 };
@@ -31,9 +53,8 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction): 
     throw new ValidationError('Email and password are required');
   }
 
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    throw new ValidationError('Email and password must be strings');
-  }
+  validateString(email, 'Email');
+  validateString(password, 'Password');
 
   next();
 };
@@ -45,14 +66,28 @@ export const validateCreateNote = (req: Request, res: Response, next: NextFuncti
     throw new ValidationError('Title and content are required');
   }
 
-  if (typeof title !== 'string' || typeof content !== 'string') {
-    throw new ValidationError('Title and content must be strings');
-  }
-
-  if (title.trim().length === 0 || content.trim().length === 0) {
-    throw new ValidationError('Title and content cannot be empty');
-  }
+  validateNonEmptyString(title, 'Title');
+  validateNonEmptyString(content, 'Content');
 
   next();
 };
 
+export const validateUpdateNote = (req: Request, res: Response, next: NextFunction): void => {
+  const { title, content } = req.body;
+
+  // Both fields are optional for update, but if provided, must be valid
+  if (title !== undefined) {
+    validateNonEmptyString(title, 'Title');
+  }
+
+  if (content !== undefined) {
+    validateNonEmptyString(content, 'Content');
+  }
+
+  // At least one field must be provided
+  if (title === undefined && content === undefined) {
+    throw new ValidationError('At least one field (title or content) must be provided for update');
+  }
+
+  next();
+};
