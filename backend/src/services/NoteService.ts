@@ -1,12 +1,9 @@
 import { NoteRepository } from '../repositories/NoteRepository';
 import { CreateNoteInput, UpdateNoteInput, Note } from '../domain/Note';
+import { ValidationError, NotFoundError, ForbiddenError } from '../domain/errors';
 
 export class NoteService {
-  private noteRepository: NoteRepository;
-
-  constructor() {
-    this.noteRepository = new NoteRepository();
-  }
+  constructor(private noteRepository: NoteRepository) {}
 
   async listNotes(userId: string): Promise<Note[]> {
     return this.noteRepository.findByUserId(userId);
@@ -15,18 +12,15 @@ export class NoteService {
   async getNoteById(id: string, userId: string): Promise<Note> {
     const note = await this.noteRepository.findById(id);
     if (!note) {
-      throw new Error('Note not found');
+      throw new NotFoundError('Note not found');
     }
     if (note.userId !== userId) {
-      throw new Error('Unauthorized: Note does not belong to user');
+      throw new ForbiddenError('Note does not belong to user');
     }
     return note;
   }
 
   async createNote(input: CreateNoteInput): Promise<Note> {
-    if (!input.title || !input.content) {
-      throw new Error('Title and content are required');
-    }
     return this.noteRepository.create(input);
   }
 

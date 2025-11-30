@@ -2,21 +2,24 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories/UserRepository';
 import { CreateUserInput, UserWithoutPassword } from '../domain/User';
+import { ValidationError, UnauthorizedError } from '../domain/errors';
 
 export class AuthService {
-  private userRepository: UserRepository;
   private jwtSecret: string;
 
-  constructor() {
-    this.userRepository = new UserRepository();
-    this.jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+  constructor(private userRepository: UserRepository) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+    this.jwtSecret = secret;
   }
 
   async register(input: CreateUserInput): Promise<{ user: UserWithoutPassword; token: string }> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new ValidationError('User with this email already exists');
     }
 
     // Hash password
@@ -44,13 +47,13 @@ export class AuthService {
     // Find user by email
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedError('Invalid email or password');
     }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedError('Invalid email or password');
     }
 
     // Generate JWT token
@@ -73,7 +76,7 @@ export class AuthService {
       const decoded = jwt.verify(token, this.jwtSecret) as { userId: string };
       return decoded;
     } catch (error) {
-      throw new Error('Invalid or expired token');
+      throw new UnauthorizedError('Invalid or expired token');
     }
   }
 }
