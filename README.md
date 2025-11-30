@@ -36,11 +36,25 @@ notes-devops/
    cd notes-devops
    ```
 
-2. Set up environment variables (optional, defaults provided):
+2. Set up environment variables:
    ```bash
-   # Create .env file in root directory
-   JWT_SECRET=your-secret-key-change-in-production
+   # Copy example files and customize
+   cp .env.example .env
+   cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
+   
+   # Edit .env files and set your JWT_SECRET (required)
+   # Generate a secure secret: openssl rand -base64 32
    ```
+   
+   **Required variables:**
+   - `JWT_SECRET` - Secret key for JWT token signing (required)
+   
+   **Optional variables:**
+   - `DATABASE_URL` - PostgreSQL connection string (defaults provided in docker-compose)
+   - `PORT` - Backend server port (defaults to 3000)
+   - `NODE_ENV` - Node environment (defaults to development)
+   - `VITE_API_URL` - Frontend API URL (defaults to /api for nginx proxy)
 
 3. Start all services:
    ```bash
@@ -62,19 +76,25 @@ notes-devops/
 
 ### Development
 
-To run services individually:
+To run services individually (without Docker):
 
 ```bash
 # Backend only
 cd backend
+cp .env.example .env
+# Edit .env with your DATABASE_URL and JWT_SECRET
 npm install
 npm run dev
 
 # Frontend only
 cd frontend
+cp .env.example .env
+# Edit .env if you need to change VITE_API_URL
 npm install
 npm run dev
 ```
+
+**Note**: Make sure PostgreSQL is running and accessible when running backend locally.
 
 ## Branches
 
