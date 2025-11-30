@@ -1,0 +1,31 @@
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../domain/errors';
+
+export const errorHandler = (
+  err: Error | AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({
+      error: err.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    });
+    return;
+  }
+
+  // Handle unexpected errors
+  console.error('Unexpected error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { message: err.message, stack: err.stack }),
+  });
+};
+
+export const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
+
