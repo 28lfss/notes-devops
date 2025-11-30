@@ -1,16 +1,16 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserRepository } from '../repositories/UserRepository';
+import { IUserRepository } from '../repositories/interfaces';
 import { CreateUserInput, UserWithoutPassword } from '../domain/User';
-import { ValidationError, UnauthorizedError } from '../domain/errors';
+import { ValidationError, UnauthorizedError, AppError } from '../domain/errors';
 
 export class AuthService {
   private jwtSecret: string;
 
-  constructor(private userRepository: UserRepository) {
+  constructor(private userRepository: IUserRepository) {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      throw new Error('JWT_SECRET environment variable is required');
+      throw new AppError('JWT_SECRET environment variable is required', 500);
     }
     this.jwtSecret = secret;
   }
@@ -28,7 +28,6 @@ export class AuthService {
     // Create user
     const user = await this.userRepository.create({
       email: input.email,
-      password: input.password,
       passwordHash,
     });
 

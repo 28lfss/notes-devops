@@ -1,9 +1,9 @@
-import { NoteRepository } from '../repositories/NoteRepository';
+import { INoteRepository } from '../repositories/interfaces';
 import { CreateNoteInput, UpdateNoteInput, Note } from '../domain/Note';
-import { ValidationError, NotFoundError, ForbiddenError } from '../domain/errors';
+import { NotFoundError, ForbiddenError } from '../domain/errors';
 
 export class NoteService {
-  constructor(private noteRepository: NoteRepository) {}
+  constructor(private noteRepository: INoteRepository) {}
 
   async listNotes(userId: string): Promise<Note[]> {
     return this.noteRepository.findByUserId(userId);

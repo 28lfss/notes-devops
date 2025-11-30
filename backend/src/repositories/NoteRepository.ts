@@ -1,7 +1,8 @@
 import prisma from './prismaClient';
 import { Note, CreateNoteInput, UpdateNoteInput } from '../domain/Note';
+import { INoteRepository } from './interfaces';
 
-export class NoteRepository {
+export class NoteRepository implements INoteRepository {
   async findByUserId(userId: string): Promise<Note[]> {
     const notes = await prisma.note.findMany({
       where: { userId },
