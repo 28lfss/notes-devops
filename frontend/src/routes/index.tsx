@@ -5,9 +5,16 @@ import { RegisterPage } from '../features/auth/RegisterPage';
 import { NotesPage } from '../features/notes/NotesPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
+const FRONTEND_PREFIX = import.meta.env.VITE_FRONTEND_PREFIX || '';
+const normalizedPrefix = FRONTEND_PREFIX 
+  ? (FRONTEND_PREFIX.startsWith('/') 
+      ? FRONTEND_PREFIX.replace(/\/$/, '') 
+      : `/${FRONTEND_PREFIX.replace(/\/$/, '')}`)
+  : '';
+
 export const AppRoutes = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={normalizedPrefix}>
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/notes" replace />} />
