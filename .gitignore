@@ -64,6 +64,7 @@ coverage/
 *.sublime-project
 *.sublime-workspace
 *.code-workspace
+.cursorignore
 
 # OS files
 .DS_Store
