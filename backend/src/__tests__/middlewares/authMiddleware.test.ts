@@ -11,12 +11,12 @@ describe('authMiddleware', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: NextFunction;
-  let mockAuthService: jest.Mocked<AuthService>;
+  let mockAuthService: Partial<jest.Mocked<AuthService>>;
 
   beforeEach(() => {
     mockAuthService = {
       verifyToken: jest.fn(),
-    } as jest.Mocked<AuthService>;
+    };
 
     (Dependencies.getAuthService as jest.Mock) = jest.fn().mockReturnValue(mockAuthService);
 

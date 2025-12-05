@@ -6,7 +6,7 @@ import { NotFoundError } from '../../domain/errors';
 
 describe('NoteController', () => {
   let noteController: NoteController;
-  let mockNoteService: jest.Mocked<NoteService>;
+  let mockNoteService: Partial<jest.Mocked<NoteService>>;
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
@@ -18,9 +18,9 @@ describe('NoteController', () => {
       createNote: jest.fn(),
       updateNote: jest.fn(),
       deleteNote: jest.fn(),
-    } as jest.Mocked<NoteService>;
+    };
 
-    noteController = new NoteController(mockNoteService);
+    noteController = new NoteController(mockNoteService as NoteService);
 
     mockRequest = {
       body: {},

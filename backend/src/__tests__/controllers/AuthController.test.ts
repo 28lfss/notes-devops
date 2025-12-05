@@ -5,7 +5,7 @@ import { ValidationError, UnauthorizedError } from '../../domain/errors';
 
 describe('AuthController', () => {
   let authController: AuthController;
-  let mockAuthService: jest.Mocked<AuthService>;
+  let mockAuthService: Partial<jest.Mocked<AuthService>>;
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
@@ -15,9 +15,9 @@ describe('AuthController', () => {
       register: jest.fn(),
       login: jest.fn(),
       verifyToken: jest.fn(),
-    } as jest.Mocked<AuthService>;
+    };
 
-    authController = new AuthController(mockAuthService);
+    authController = new AuthController(mockAuthService as AuthService);
 
     mockRequest = {
       body: {},
