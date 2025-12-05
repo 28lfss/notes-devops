@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  enforce-branch-flow:
+    name: Enforce branch flow (develop → staging → main)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check PR source/target rules
+        run: |
+          echo "Base: ${{ github.base_ref }}, Head: ${{ github.head_ref }}"
+
+          # main só aceita PR vindo de staging
+          if [ "${{ github.base_ref }}" = "main" ] && [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "ERROR: main only accepts PRs from staging."
+            exit 1
+          fi
+
+          # staging só aceita PR vindo de develop
+          if [ "${{ github.base_ref }}" = "staging" ] && [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "ERROR: staging only accepts PRs from develop."
+            exit 1
+          fi
+
+          echo "Branch flow is valid."
+
+  test:
+    name: Backend & Frontend lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Backend
+      - name: Setup Node for backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Lint backend
+        working-directory: ./backend
+        run: npm test
+
+      # Frontend
+      - name: Setup Node for frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint frontend
+        working-directory: ./frontend
+        run: npm test
