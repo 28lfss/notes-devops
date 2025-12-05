@@ -15,7 +15,7 @@ describe('AuthController', () => {
       register: jest.fn(),
       login: jest.fn(),
       verifyToken: jest.fn(),
-    } as any;
+    } as jest.Mocked<AuthService>;
 
     authController = new AuthController(mockAuthService);
 

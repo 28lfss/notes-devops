@@ -1,4 +1,4 @@
-import { User, CreateUserInput } from '../domain/User';
+import { User } from '../domain/User';
 import { Note, CreateNoteInput, UpdateNoteInput } from '../domain/Note';
 
 export interface IUserRepository {

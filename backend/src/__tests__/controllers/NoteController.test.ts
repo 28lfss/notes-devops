@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { NoteController } from '../../controllers/noteController';
 import { NoteService } from '../../services/NoteService';
 import { Note } from '../../domain/Note';
-import { NotFoundError, ForbiddenError } from '../../domain/errors';
+import { NotFoundError } from '../../domain/errors';
 
 describe('NoteController', () => {
   let noteController: NoteController;
@@ -18,7 +18,7 @@ describe('NoteController', () => {
       createNote: jest.fn(),
       updateNote: jest.fn(),
       deleteNote: jest.fn(),
-    } as any;
+    } as jest.Mocked<NoteService>;
 
     noteController = new NoteController(mockNoteService);
 
