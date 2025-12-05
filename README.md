@@ -9,7 +9,7 @@ A fullstack notes application with DevOps best practices.
 - **Database**: PostgreSQL
 - **Infrastructure**: Docker + Docker Compose
 - **Monitoring**: Zabbix + Grafana
-- **Cloud**: AWS EC2
+- **Cloud**: AWS (ECS Fargate + ALB + RDS)
 - **CI/CD**: GitHub Actions
 
 For detailed architecture documentation, see:
