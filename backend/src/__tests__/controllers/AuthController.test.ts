@@ -68,7 +68,10 @@ describe('AuthController', () => {
       mockRequest.body = { email, password };
       mockAuthService.register.mockRejectedValue(error);
 
-      await authController.register(mockRequest as Request, mockResponse as Response, mockNext);
+      authController.register(mockRequest as Request, mockResponse as Response, mockNext);
+      
+      // Wait for asyncHandler to catch the error and call next
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockAuthService.register).toHaveBeenCalledWith({ email, password });
       expect(mockResponse.status).not.toHaveBeenCalled();
@@ -110,7 +113,10 @@ describe('AuthController', () => {
       mockRequest.body = { email, password };
       mockAuthService.login.mockRejectedValue(error);
 
-      await authController.login(mockRequest as Request, mockResponse as Response, mockNext);
+      authController.login(mockRequest as Request, mockResponse as Response, mockNext);
+      
+      // Wait for asyncHandler to catch the error and call next
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockAuthService.login).toHaveBeenCalledWith(email, password);
       expect(mockResponse.status).not.toHaveBeenCalled();

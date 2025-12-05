@@ -101,7 +101,10 @@ describe('NoteController', () => {
       mockRequest.userId = userId;
       mockNoteService.getNoteById.mockRejectedValue(error);
 
-      await noteController.getNote(mockRequest as Request, mockResponse as Response, mockNext);
+      noteController.getNote(mockRequest as Request, mockResponse as Response, mockNext);
+      
+      // Wait for asyncHandler to catch the error and call next
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockNoteService.getNoteById).toHaveBeenCalledWith(noteId, userId);
       expect(mockNext).toHaveBeenCalledWith(error);
@@ -173,7 +176,10 @@ describe('NoteController', () => {
       mockRequest.userId = userId;
       mockNoteService.updateNote.mockRejectedValue(error);
 
-      await noteController.updateNote(mockRequest as Request, mockResponse as Response, mockNext);
+      noteController.updateNote(mockRequest as Request, mockResponse as Response, mockNext);
+      
+      // Wait for asyncHandler to catch the error and call next
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockNoteService.updateNote).toHaveBeenCalledWith(noteId, userId, { title: 'Updated Title' });
       expect(mockNext).toHaveBeenCalledWith(error);
@@ -206,7 +212,10 @@ describe('NoteController', () => {
       mockRequest.userId = userId;
       mockNoteService.deleteNote.mockRejectedValue(error);
 
-      await noteController.deleteNote(mockRequest as Request, mockResponse as Response, mockNext);
+      noteController.deleteNote(mockRequest as Request, mockResponse as Response, mockNext);
+      
+      // Wait for asyncHandler to catch the error and call next
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockNoteService.deleteNote).toHaveBeenCalledWith(noteId, userId);
       expect(mockNext).toHaveBeenCalledWith(error);
