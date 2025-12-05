@@ -35,7 +35,7 @@ jobs:
           echo "Branch flow is valid."
 
   test:
-    name: Backend & Frontend lint
+    name: Backend & Frontend Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -47,29 +47,36 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
 
       - name: Install backend dependencies
         working-directory: ./backend
-        run: npm ci
+        run: npm install
+
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test
+        env:
+          JWT_SECRET: test-secret-key-for-ci
+          NODE_ENV: test
 
       - name: Lint backend
         working-directory: ./backend
-        run: npm test
+        run: npm run lint
 
       # Frontend
       - name: Setup Node for frontend
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm ci
+        run: npm install
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test
 
       - name: Lint frontend
         working-directory: ./frontend
-        run: npm test
+        run: npm run lint
