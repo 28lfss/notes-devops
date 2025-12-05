@@ -7,8 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const path = req.originalUrl || req.url;
 
-  // Skip logging for /health path
-  if (path === '/health') {
+  // Skip logging for any path containing /health
+  if (path.includes('/health')) {
     next();
     return;
   }
