@@ -9,7 +9,7 @@ A fullstack notes application with DevOps best practices.
 - **Database**: PostgreSQL
 - **Infrastructure**: Docker + Docker Compose
 - **Monitoring**: Zabbix + Grafana
-- **Cloud**: AWS EC2
+- **Cloud**: AWS (ECS Fargate + ALB + RDS)
 - **CI/CD**: GitHub Actions
 
 For detailed architecture documentation, see:
@@ -52,13 +52,15 @@ notes-devops/
    ```
    
    **Required variables:**
-   - `JWT_SECRET` - Secret key for JWT token signing (required)
+   - `JWT_SECRET` (backend) - Secret key for JWT token signing
    
    **Optional variables:**
-   - `DATABASE_URL` - PostgreSQL connection string (defaults provided in docker-compose)
-   - `PORT` - Backend server port (defaults to 3000)
-   - `NODE_ENV` - Node environment (defaults to development)
-   - `VITE_API_URL` - Frontend API URL (defaults to /api for nginx proxy)
+   - `DATABASE_URL` (backend) - PostgreSQL connection string (defaults provided in docker-compose)
+   - `PORT` (backend) - Server port (defaults to 3000)
+   - `NODE_ENV` (backend) - Node environment (defaults to development)
+   - `API_PREFIX` (backend) - API base path prefix (defaults to /api)
+   - `VITE_API_URL` (frontend) - API base URL (defaults to /api, should match API_PREFIX)
+   - `VITE_FRONTEND_PREFIX` (frontend) - Frontend base path prefix (defaults to empty for root)
 
 3. Start all services:
    ```bash
@@ -68,8 +70,8 @@ notes-devops/
    **Note**: If you're using Docker Compose v2 (default in newer Docker versions), use `docker compose` (without hyphen). For older versions, use `docker-compose`.
 
 4. Access the application:
-   - Frontend: http://localhost:8080
-   - Backend API: http://localhost:8080/api
+   - Frontend: http://localhost:8080 (or with prefix if VITE_FRONTEND_PREFIX is set)
+   - Backend API: http://localhost:8080/api (or with custom prefix if API_PREFIX is set)
    - PostgreSQL: localhost:5432
 
 ### Services
@@ -93,7 +95,7 @@ npm run dev
 # Frontend only
 cd frontend
 cp .env.example .env
-# Edit .env if you need to change VITE_API_URL
+# Edit .env if you need to change VITE_API_URL or VITE_FRONTEND_PREFIX
 npm install
 npm run dev
 ```

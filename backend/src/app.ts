@@ -2,12 +2,16 @@ import express, { Express } from 'express';
 import cors from 'cors';
 import routes from './controllers/routes';
 import { errorHandler } from './middlewares/errorHandler';
+import { requestLogger } from './middlewares/requestLogger';
 
 const app: Express = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Request logging middleware
+app.use(requestLogger);
 
 // Get API prefix from environment variable, default to '/api'
 const API_PREFIX = process.env.API_PREFIX || '/api';

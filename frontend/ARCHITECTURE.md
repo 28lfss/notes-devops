@@ -26,6 +26,7 @@ src/
    - Handles token management (localStorage)
    - Consistent error handling with `ApiError` class
    - `handleApiError` utility for DRY error handling
+   - Configurable API base URL via `VITE_API_URL` environment variable
 
 2. **Components Layer** (`components/`)
    - **Shared UI Components**: Reusable, presentational components
@@ -51,9 +52,10 @@ src/
    - Promotes code reusability and separation of concerns
 
 5. **Routes Layer** (`routes/`)
-   - `index.tsx` - Main routing configuration
+   - `index.tsx` - Main routing configuration with dynamic basename
    - `ProtectedRoute` - Route guard for authenticated routes
    - Uses React Router for client-side routing
+   - Supports configurable frontend prefix via `VITE_FRONTEND_PREFIX` environment variable
 
 6. **Utils Layer** (`utils/`)
    - `classNames` - Utility for conditional className joining
@@ -164,6 +166,13 @@ src/
 - **Authentication**: Bearer token in Authorization header
 - **Error Handling**: Consistent `ApiError` class
 - **Type Safety**: Full TypeScript interfaces
+- **Configurable Base URL**: Uses `VITE_API_URL` environment variable (defaults to `/api`)
+
+### Configuration
+The API client reads the base URL from the `VITE_API_URL` environment variable:
+- Default: `/api`
+- Should match the backend `API_PREFIX` environment variable
+- Example: If backend uses `API_PREFIX=/v1/api`, set `VITE_API_URL=/v1/api`
 
 ### Methods
 - `login()` - User authentication
@@ -184,10 +193,49 @@ src/
 - `/register` - Registration page (public)
 - `/notes` - Notes management (protected)
 
+### Dynamic Base Path
+The routing system supports a configurable frontend prefix via `VITE_FRONTEND_PREFIX`:
+- **Default**: Empty string (routes at root: `/login`, `/notes`)
+- **With prefix**: If set to `/staging`, routes become `/staging/login`, `/staging/notes`
+- The `basename` prop in `BrowserRouter` is dynamically set based on the environment variable
+- Prefix is normalized (ensures it starts with `/` and doesn't end with `/`)
+
 ### Route Protection
 - `ProtectedRoute` component checks authentication
 - Redirects to `/login` if not authenticated
 - Uses `api.isAuthenticated()` for token check
+
+## Configuration
+
+### Environment Variables
+
+The frontend supports the following environment variables (defined in `.env` or `.env.example`):
+
+#### `VITE_API_URL`
+- **Purpose**: Configures the API base URL for all API requests
+- **Default**: `/api`
+- **Example**: `/api`, `/v1/api`, `http://localhost:3000/api`
+- **Note**: Should match the backend `API_PREFIX` environment variable
+- **Usage**: Used by the API client and Vite development proxy
+
+#### `VITE_FRONTEND_PREFIX`
+- **Purpose**: Sets the base path prefix for all frontend routes
+- **Default**: Empty string (routes at root)
+- **Example**: `/staging`, `/production`, `/dev`
+- **Usage**: 
+  - Applied to Vite's `base` configuration (affects asset paths)
+  - Applied to React Router's `basename` (affects route paths)
+  - If set to `/staging`, all routes become `/staging/login`, `/staging/notes`, etc.
+
+### Vite Configuration
+
+The `vite.config.ts` file includes:
+- **Dynamic Base Path**: Uses `VITE_FRONTEND_PREFIX` for the `base` option
+- **Dynamic Proxy**: Uses `VITE_API_URL` for the development proxy configuration
+- **Proxy Target**: Forwards API requests to `http://backend:3000` during development
+- **Port**: Development server runs on port `5173`
+
+The proxy automatically adapts to different API prefixes, ensuring development requests are correctly forwarded to the backend.
 
 ## Styling
 
@@ -228,6 +276,47 @@ The architecture is designed for easy testing:
 6. **Performance**: Consider React.memo, useMemo, useCallback optimizations
 7. **Error Boundaries**: Add React Error Boundaries for better error handling
 
+## Build and Deployment
+
+### Build Process
+1. Environment variables are read at build time (Vite replaces `import.meta.env.*` during build)
+2. The `base` path is set in Vite config, affecting all asset paths in the built files
+3. React Router's `basename` is set at runtime from `import.meta.env.VITE_FRONTEND_PREFIX`
+
+### Nginx Configuration
+The `nginx.conf` file is configured to:
+- Serve the built static files from `/usr/share/nginx/html`
+- Handle SPA routing by serving `index.html` for all routes
+- Support any frontend prefix (handled by Vite's base configuration at build time)
+- Cache static assets (JS, CSS, images) for 1 year
+
+### Deployment Considerations
+- **Environment Variables**: Must be set before building (for Vite) or at runtime (for React Router)
+- **API URL**: Ensure `VITE_API_URL` matches the backend `API_PREFIX` in production
+- **Frontend Prefix**: If using a prefix, ensure nginx/proxy is configured to serve from that path
+- **Asset Paths**: All asset paths are automatically prefixed based on `VITE_FRONTEND_PREFIX`
+
+### Multi-Environment Setup
+Example configurations for different environments:
+
+**Development:**
+```bash
+VITE_API_URL=/api
+VITE_FRONTEND_PREFIX=
+```
+
+**Staging:**
+```bash
+VITE_API_URL=/api
+VITE_FRONTEND_PREFIX=/staging
+```
+
+**Production:**
+```bash
+VITE_API_URL=/api
+VITE_FRONTEND_PREFIX=/production
+```
+
 ## Current Status
 
 - **Architecture**: Clean and well-organized
@@ -236,4 +325,6 @@ The architecture is designed for easy testing:
 - **Reusability**: Components and hooks are reusable
 - **Type Safety**: Full TypeScript coverage
 - **Consistency**: Standardized patterns throughout
+- **Configuration**: Supports flexible environment-based configuration
+- **Deployment**: Ready for multi-environment deployments with configurable prefixes
 
