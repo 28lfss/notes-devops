@@ -20,7 +20,7 @@ describe('NoteController', () => {
       deleteNote: jest.fn(),
     };
 
-    noteController = new NoteController(mockNoteService as NoteService);
+    noteController = new NoteController(mockNoteService as unknown as NoteService);
 
     mockRequest = {
       body: {},
@@ -56,7 +56,7 @@ describe('NoteController', () => {
       ];
 
       mockRequest.userId = userId;
-      mockNoteService.listNotes.mockResolvedValue(mockNotes);
+      mockNoteService.listNotes!.mockResolvedValue(mockNotes);
 
       await noteController.listNotes(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -82,7 +82,7 @@ describe('NoteController', () => {
 
       mockRequest.params = { id: noteId };
       mockRequest.userId = userId;
-      mockNoteService.getNoteById.mockResolvedValue(mockNote);
+      mockNoteService.getNoteById!.mockResolvedValue(mockNote);
 
       await noteController.getNote(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -99,7 +99,7 @@ describe('NoteController', () => {
 
       mockRequest.params = { id: noteId };
       mockRequest.userId = userId;
-      mockNoteService.getNoteById.mockRejectedValue(error);
+      mockNoteService.getNoteById!.mockRejectedValue(error);
 
       noteController.getNote(mockRequest as Request, mockResponse as Response, mockNext);
       
@@ -127,7 +127,7 @@ describe('NoteController', () => {
 
       mockRequest.body = { title, content };
       mockRequest.userId = userId;
-      mockNoteService.createNote.mockResolvedValue(mockNote);
+      mockNoteService.createNote!.mockResolvedValue(mockNote);
 
       await noteController.createNote(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -156,7 +156,7 @@ describe('NoteController', () => {
       mockRequest.params = { id: noteId };
       mockRequest.body = { title, content };
       mockRequest.userId = userId;
-      mockNoteService.updateNote.mockResolvedValue(mockNote);
+      mockNoteService.updateNote!.mockResolvedValue(mockNote);
 
       await noteController.updateNote(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -174,7 +174,7 @@ describe('NoteController', () => {
       mockRequest.params = { id: noteId };
       mockRequest.body = { title: 'Updated Title' };
       mockRequest.userId = userId;
-      mockNoteService.updateNote.mockRejectedValue(error);
+      mockNoteService.updateNote!.mockRejectedValue(error);
 
       noteController.updateNote(mockRequest as Request, mockResponse as Response, mockNext);
       
@@ -193,7 +193,7 @@ describe('NoteController', () => {
 
       mockRequest.params = { id: noteId };
       mockRequest.userId = userId;
-      mockNoteService.deleteNote.mockResolvedValue(undefined);
+      mockNoteService.deleteNote!.mockResolvedValue(undefined);
 
       await noteController.deleteNote(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -210,7 +210,7 @@ describe('NoteController', () => {
 
       mockRequest.params = { id: noteId };
       mockRequest.userId = userId;
-      mockNoteService.deleteNote.mockRejectedValue(error);
+      mockNoteService.deleteNote!.mockRejectedValue(error);
 
       noteController.deleteNote(mockRequest as Request, mockResponse as Response, mockNext);
       

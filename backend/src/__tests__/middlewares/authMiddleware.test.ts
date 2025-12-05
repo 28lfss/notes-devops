@@ -41,7 +41,7 @@ describe('authMiddleware', () => {
       authorization: `Bearer ${token}`,
     };
 
-    mockAuthService.verifyToken.mockReturnValue({ userId });
+    mockAuthService.verifyToken!.mockReturnValue({ userId });
 
     authMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -78,7 +78,7 @@ describe('authMiddleware', () => {
       authorization: `Bearer ${token}`,
     };
 
-    mockAuthService.verifyToken.mockImplementation(() => {
+    mockAuthService.verifyToken!.mockImplementation(() => {
       throw error;
     });
 

@@ -17,7 +17,7 @@ describe('AuthController', () => {
       verifyToken: jest.fn(),
     };
 
-    authController = new AuthController(mockAuthService as AuthService);
+    authController = new AuthController(mockAuthService as unknown as AuthService);
 
     mockRequest = {
       body: {},
@@ -50,7 +50,7 @@ describe('AuthController', () => {
       };
 
       mockRequest.body = { email, password };
-      mockAuthService.register.mockResolvedValue(mockResult);
+      mockAuthService.register!.mockResolvedValue(mockResult);
 
       await authController.register(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -66,7 +66,7 @@ describe('AuthController', () => {
       const error = new ValidationError('User already exists');
 
       mockRequest.body = { email, password };
-      mockAuthService.register.mockRejectedValue(error);
+      mockAuthService.register!.mockRejectedValue(error);
 
       authController.register(mockRequest as Request, mockResponse as Response, mockNext);
       
@@ -95,7 +95,7 @@ describe('AuthController', () => {
       };
 
       mockRequest.body = { email, password };
-      mockAuthService.login.mockResolvedValue(mockResult);
+      mockAuthService.login!.mockResolvedValue(mockResult);
 
       await authController.login(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -111,7 +111,7 @@ describe('AuthController', () => {
       const error = new UnauthorizedError('Invalid credentials');
 
       mockRequest.body = { email, password };
-      mockAuthService.login.mockRejectedValue(error);
+      mockAuthService.login!.mockRejectedValue(error);
 
       authController.login(mockRequest as Request, mockResponse as Response, mockNext);
       
