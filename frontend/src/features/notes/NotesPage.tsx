@@ -75,6 +75,7 @@ export const NotesPage = () => {
     setEditingNoteId(note.id);
     setEditTitle(note.title);
     setEditContent(note.content);
+    setShowForm(false); // Close create form if open
     setError('');
   };
 
@@ -111,7 +112,21 @@ export const NotesPage = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Notes</h1>
-        <Button onClick={() => setShowForm(!showForm)}>
+        <Button
+          onClick={() => {
+            if (showForm) {
+              setShowForm(false);
+              setTitle('');
+              setContent('');
+            } else {
+              setShowForm(true);
+              // Cancel any ongoing edit
+              if (editingNoteId) {
+                handleCancelEdit();
+              }
+            }
+          }}
+        >
           {showForm ? 'Cancel' : 'New Note'}
         </Button>
       </div>
