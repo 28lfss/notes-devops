@@ -30,6 +30,7 @@ export class AuthService {
 
     const token = this.generateToken(user.id);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
       user: userWithoutPassword as UserWithoutPassword,
@@ -50,6 +51,7 @@ export class AuthService {
 
     const token = this.generateToken(user.id);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
       user: userWithoutPassword as UserWithoutPassword,
