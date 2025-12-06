@@ -260,6 +260,34 @@ The Express application is configured with:
   - Returns: `{ status: 'ok' }` (200 OK)
   - Note: This endpoint is not prefixed and is always available at root level
 
+## API Documentation (Swagger)
+
+The API is documented using Swagger/OpenAPI 3.0. The interactive API documentation is available at:
+
+- **Swagger UI**: `{API_PREFIX}/api-docs` (default: `/api/api-docs`)
+
+### Features
+
+- **Interactive Documentation**: Test all endpoints directly from the browser
+- **Authentication Support**: JWT Bearer token authentication is configured
+- **Complete Schema Definitions**: All request/response schemas are documented
+- **Error Responses**: All possible error responses are documented
+
+### Configuration
+
+Swagger configuration is located in `src/config/swagger.ts`:
+- OpenAPI 3.0.0 specification
+- All schemas defined in `components/schemas`
+- JWT Bearer authentication scheme configured
+- Documentation annotations in controller files using JSDoc `@swagger` comments
+
+### Usage
+
+1. Start the backend server
+2. Navigate to `http://localhost:3000/api/api-docs` (or your configured `API_PREFIX`)
+3. Use the "Authorize" button to add your JWT token for protected endpoints
+4. Test endpoints directly from the Swagger UI
+
 ## Error Responses
 
 All endpoints return consistent error responses:
@@ -346,7 +374,7 @@ The `Dependencies` class in `config/dependencies.ts` provides a singleton factor
 - **Maintainability**: Easy to understand and modify
 - **Testability**: Designed for easy testing
 - **Scalability**: Can grow without major refactoring
-- **API Documentation**: Endpoints documented above
+- **API Documentation**: Swagger/OpenAPI documentation available at `{API_PREFIX}/api-docs`
 - **Configuration**: Supports flexible environment-based configuration
 - **Security**: JWT authentication, password hashing, input validation
 - **Error Handling**: Comprehensive error handling with development mode support
