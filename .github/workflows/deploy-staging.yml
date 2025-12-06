@@ -1,0 +1,133 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # precisamos de pelo menos 2 commits para comparar
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  deploy-backend-staging:
+    name: Deploy backend staging (if changed)
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.backend == 'true'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag and push backend image (staging)
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: notes-backend
+          VERSION_TAG: staging-v${{ github.run_number }}
+          LATEST_TAG: staging-latest
+        run: |
+          echo "Building backend image $REGISTRY/$REPOSITORY:$VERSION_TAG"
+
+          docker build \
+            -f backend/Dockerfile \
+            -t $REGISTRY/$REPOSITORY:$VERSION_TAG \
+            ./backend
+
+          docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$LATEST_TAG
+
+          docker push $REGISTRY/$REPOSITORY:$VERSION_TAG
+          docker push $REGISTRY/$REPOSITORY:$LATEST_TAG
+
+      - name: Update ECS backend staging service
+        run: |
+          aws ecs update-service \
+            --cluster notes-cluster \
+            --service notes-backend-staging-service \
+            --force-new-deployment
+
+  deploy-frontend-staging:
+    name: Deploy frontend staging (if changed)
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.frontend == 'true'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag and push frontend image (staging)
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: notes-frontend
+          VERSION_TAG: staging-v${{ github.run_number }}
+          LATEST_TAG: staging-latest
+        run: |
+          echo "Building frontend image $REGISTRY/$REPOSITORY:$VERSION_TAG"
+
+          docker build \
+            --build-arg VITE_FRONTEND_PREFIX=/staging/ \
+            --build-arg VITE_API_URL=/staging/api \
+            -f frontend/Dockerfile \
+            -t $REGISTRY/$REPOSITORY:$VERSION_TAG \
+            ./frontend
+
+          docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$LATEST_TAG
+
+          docker push $REGISTRY/$REPOSITORY:$VERSION_TAG
+          docker push $REGISTRY/$REPOSITORY:$LATEST_TAG
+
+      - name: Update ECS frontend staging service
+        run: |
+          aws ecs update-service \
+            --cluster notes-cluster \
+            --service notes-frontend-staging-service \
+            --force-new-deployment
