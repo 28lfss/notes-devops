@@ -20,13 +20,11 @@ jobs:
         run: |
           echo "Base: ${{ github.base_ref }}, Head: ${{ github.head_ref }}"
 
-          # main só aceita PR vindo de staging
           if [ "${{ github.base_ref }}" = "main" ] && [ "${{ github.head_ref }}" != "staging" ]; then
             echo "ERROR: main only accepts PRs from staging."
             exit 1
           fi
 
-          # staging só aceita PR vindo de develop
           if [ "${{ github.base_ref }}" = "staging" ] && [ "${{ github.head_ref }}" != "develop" ]; then
             echo "ERROR: staging only accepts PRs from develop."
             exit 1
