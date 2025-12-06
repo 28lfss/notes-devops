@@ -8,5 +8,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <AppRoutes />
   </React.StrictMode>,
 )
-
-// This comment is to test the CI/CD pipeline
