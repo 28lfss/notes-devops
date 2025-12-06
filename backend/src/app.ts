@@ -1,8 +1,10 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import routes from './controllers/routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestLogger } from './middlewares/requestLogger';
+import { swaggerSpec } from './config/swagger';
 
 const app: Express = express();
 
@@ -19,6 +21,12 @@ const API_PREFIX = process.env.API_PREFIX || '/api';
 const normalizedPrefix = API_PREFIX.startsWith('/') 
   ? API_PREFIX.replace(/\/$/, '') 
   : `/${API_PREFIX.replace(/\/$/, '')}`;
+
+// Swagger UI setup
+app.use(`${normalizedPrefix}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Notes API Documentation',
+}));
 
 app.use(normalizedPrefix, routes);
 
