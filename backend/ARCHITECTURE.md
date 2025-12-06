@@ -279,6 +279,15 @@ All endpoints return consistent error responses:
 }
 ```
 
+**Development Mode (Unexpected Errors - non-AppError):**
+```json
+{
+  "error": "Internal server error",
+  "message": "Original error message",
+  "stack": "Error stack trace..."
+}
+```
+
 ### Error Classes
 
 The application uses custom error classes from the domain layer:
