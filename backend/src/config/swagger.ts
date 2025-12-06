@@ -1,9 +1,18 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
+/**
+ * Normalizes API prefix to ensure it starts with '/' and doesn't end with '/'
+ * @param prefix - The API prefix from environment variable
+ * @returns Normalized prefix
+ */
+const normalizeApiPrefix = (prefix: string): string => {
+  return prefix.startsWith('/') 
+    ? prefix.replace(/\/$/, '') 
+    : `/${prefix.replace(/\/$/, '')}`;
+};
+
 const API_PREFIX = process.env.API_PREFIX || '/api';
-const normalizedPrefix = API_PREFIX.startsWith('/') 
-  ? API_PREFIX.replace(/\/$/, '') 
-  : `/${API_PREFIX.replace(/\/$/, '')}`;
+const normalizedPrefix = normalizeApiPrefix(API_PREFIX);
 
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
@@ -233,7 +242,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./src/controllers/*.ts', './src/routes/*.ts'],
+  apis: ['./src/controllers/*.ts'],
 };
 
 export const swaggerSpec = swaggerJsdoc(swaggerOptions);
