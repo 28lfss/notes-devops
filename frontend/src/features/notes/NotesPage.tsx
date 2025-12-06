@@ -17,6 +17,10 @@ export const NotesPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   const loadNotes = useCallback(async () => {
     try {
@@ -64,6 +68,38 @@ export const NotesPage = () => {
       await loadNotes();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to delete note');
+    }
+  };
+
+  const handleEdit = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditTitle(note.title);
+    setEditContent(note.content);
+    setError('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingNoteId(null);
+    setEditTitle('');
+    setEditContent('');
+    setError('');
+  };
+
+  const handleUpdate = async (id: string, e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setUpdating(true);
+
+    try {
+      await api.updateNote(id, { title: editTitle, content: editContent });
+      setEditingNoteId(null);
+      setEditTitle('');
+      setEditContent('');
+      await loadNotes();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update note');
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -127,20 +163,65 @@ export const NotesPage = () => {
         <div className="grid gap-4">
           {notes.map((note) => (
             <div key={note.id} className="bg-white shadow-md rounded-lg p-6">
-              <div className="flex justify-between items-start mb-2">
-                <h2 className="text-xl font-semibold">{note.title}</h2>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(note.id)}
-                  className="text-sm"
-                >
-                  Delete
-                </Button>
-              </div>
-              <p className="text-gray-700 whitespace-pre-wrap mb-3">{note.content}</p>
-              <p className="text-sm text-gray-500">
-                Created: {new Date(note.createdAt).toLocaleString()}
-              </p>
+              {editingNoteId === note.id ? (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Edit Note</h2>
+                  <form onSubmit={(e) => handleUpdate(note.id, e)}>
+                    <Input
+                      label="Title"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      required
+                    />
+                    <Textarea
+                      label="Content"
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      rows={5}
+                      required
+                    />
+                    <div className="flex space-x-2">
+                      <Button type="submit" disabled={updating}>
+                        {updating ? 'Updating...' : 'Save Changes'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleCancelEdit}
+                        disabled={updating}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-start mb-2">
+                    <h2 className="text-xl font-semibold">{note.title}</h2>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleEdit(note)}
+                        className="text-sm"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDelete(note.id)}
+                        className="text-sm"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 whitespace-pre-wrap mb-3">{note.content}</p>
+                  <p className="text-sm text-gray-500">
+                    Created: {new Date(note.createdAt).toLocaleString()}
+                  </p>
+                </>
+              )}
             </div>
           ))}
         </div>
