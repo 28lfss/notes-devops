@@ -30,7 +30,7 @@ describe('Layout', () => {
 
   it('should render children', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Layout>
           <div>Test Content</div>
         </Layout>
@@ -41,7 +41,7 @@ describe('Layout', () => {
 
   it('should render app title', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Layout>
           <div>Content</div>
         </Layout>
@@ -54,7 +54,7 @@ describe('Layout', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(false);
 
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Layout>
           <div>Content</div>
         </Layout>
@@ -70,7 +70,7 @@ describe('Layout', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(true);
 
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Layout>
           <div>Content</div>
         </Layout>
@@ -87,7 +87,7 @@ describe('Layout', () => {
     const user = userEvent.setup();
 
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Layout>
           <div>Content</div>
         </Layout>

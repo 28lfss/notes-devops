@@ -36,7 +36,7 @@ describe('useAuth', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(true);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</BrowserRouter>
     );
 
     const { result } = renderHook(() => useAuth(), { wrapper });
@@ -49,7 +49,7 @@ describe('useAuth', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(false);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</BrowserRouter>
     );
 
     renderHook(() => useAuth(), { wrapper });
@@ -63,7 +63,7 @@ describe('useAuth', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(false);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</BrowserRouter>
     );
 
     renderHook(() => useAuth('/custom-login'), { wrapper });
@@ -77,7 +77,7 @@ describe('useAuth', () => {
     vi.mocked(api.isAuthenticated).mockReturnValue(true);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</BrowserRouter>
     );
 
     const { result } = renderHook(() => useAuth(), { wrapper });
