@@ -1,4 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import path from 'path';
 
 /**
  * Normalizes API prefix to ensure it starts with '/' and doesn't end with '/'
@@ -242,7 +243,9 @@ const swaggerOptions: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./src/controllers/*.ts'],
+  // Path to controller files with Swagger annotations
+  // Works in both dev (tsx) and production (compiled) since we copy src to production image
+  apis: [path.join(process.cwd(), 'src/controllers/*.ts')],
 };
 
 export const swaggerSpec = swaggerJsdoc(swaggerOptions);

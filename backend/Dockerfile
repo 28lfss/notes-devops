@@ -25,6 +25,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 
 RUN npx prisma generate
