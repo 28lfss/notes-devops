@@ -260,6 +260,45 @@ The Express application is configured with:
   - Returns: `{ status: 'ok' }` (200 OK)
   - Note: This endpoint is not prefixed and is always available at root level
 
+## API Documentation (Swagger)
+
+The API is documented using Swagger/OpenAPI 3.0. The interactive API documentation is available at:
+
+- **Swagger UI**: `{API_PREFIX}/api-docs` (default: `/api/api-docs`, staging: `/staging/api/api-docs`)
+
+### Features
+
+- **Interactive Documentation**: Test all endpoints directly from the browser
+- **Authentication Support**: JWT Bearer token authentication is configured
+- **Complete Schema Definitions**: All request/response schemas are documented
+- **Error Responses**: All possible error responses are documented
+- **Relative Server URLs**: Uses relative paths for compatibility with reverse proxies (nginx, ALB)
+
+### Configuration
+
+Swagger configuration is located in `src/config/swagger.ts`:
+- OpenAPI 3.0.0 specification
+- All schemas defined in `components/schemas`
+- JWT Bearer authentication scheme configured
+- Server URL uses relative path (works with nginx proxy and ALB)
+- Documentation annotations in controller files using JSDoc `@swagger` comments
+
+### Usage
+
+**Local Development (Docker):**
+1. Start all services: `docker compose -f infra/docker-compose.dev.yml up --build`
+2. Navigate to `http://localhost:8080/api/api-docs` (through nginx proxy, or directly at `http://localhost:3000/api/api-docs`)
+3. Use the "Authorize" button to add your JWT token for protected endpoints
+4. Test endpoints directly from the Swagger UI
+
+**AWS Staging:**
+- Navigate to `https://your-alb.amazonaws.com/staging/api/api-docs`
+
+**AWS Production:**
+- Navigate to `https://your-alb.amazonaws.com/api/api-docs`
+
+**Note**: Swagger UI is mounted under the `API_PREFIX` path to ensure compatibility with ALB routing in AWS. In staging, set `API_PREFIX=/staging/api` to make Swagger accessible at `/staging/api/api-docs`.
+
 ## Error Responses
 
 All endpoints return consistent error responses:
@@ -275,6 +314,15 @@ All endpoints return consistent error responses:
 ```json
 {
   "error": "Error message",
+  "stack": "Error stack trace..."
+}
+```
+
+**Development Mode (Unexpected Errors - non-AppError):**
+```json
+{
+  "error": "Internal server error",
+  "message": "Original error message",
   "stack": "Error stack trace..."
 }
 ```
@@ -337,7 +385,7 @@ The `Dependencies` class in `config/dependencies.ts` provides a singleton factor
 - **Maintainability**: Easy to understand and modify
 - **Testability**: Designed for easy testing
 - **Scalability**: Can grow without major refactoring
-- **API Documentation**: Endpoints documented above
+- **API Documentation**: Swagger/OpenAPI documentation available at `{API_PREFIX}/api-docs`
 - **Configuration**: Supports flexible environment-based configuration
 - **Security**: JWT authentication, password hashing, input validation
 - **Error Handling**: Comprehensive error handling with development mode support

@@ -1,8 +1,10 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import routes from './controllers/routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { requestLogger } from './middlewares/requestLogger';
+import { swaggerSpec } from './config/swagger';
 
 const app: Express = express();
 
@@ -13,12 +15,33 @@ app.use(express.urlencoded({ extended: true }));
 // Request logging middleware
 app.use(requestLogger);
 
+/**
+ * Normalizes API prefix to ensure it starts with '/' and doesn't end with '/'
+ * @param prefix - The API prefix from environment variable
+ * @returns Normalized prefix
+ */
+const normalizeApiPrefix = (prefix: string): string => {
+  return prefix.startsWith('/') 
+    ? prefix.replace(/\/$/, '') 
+    : `/${prefix.replace(/\/$/, '')}`;
+};
+
 // Get API prefix from environment variable, default to '/api'
 const API_PREFIX = process.env.API_PREFIX || '/api';
-// Normalize prefix: ensure it starts with '/' and doesn't end with '/'
-const normalizedPrefix = API_PREFIX.startsWith('/') 
-  ? API_PREFIX.replace(/\/$/, '') 
-  : `/${API_PREFIX.replace(/\/$/, '')}`;
+const normalizedPrefix = normalizeApiPrefix(API_PREFIX);
+
+// Swagger UI setup - mounted under API prefix for AWS compatibility
+const swaggerUiOptions = {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Notes API Documentation',
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+};
+
+// Mount Swagger UI under API prefix (e.g., /api/api-docs or /staging/api/api-docs)
+// This ensures it works with ALB routing in AWS (routes /staging/api* to backend)
+app.use(`${normalizedPrefix}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
 app.use(normalizedPrefix, routes);
 
