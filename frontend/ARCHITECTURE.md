@@ -154,10 +154,12 @@ src/
 - Navigation after successful authentication
 
 #### `NotesPage`
-- List, create, and delete notes
+- List, create, edit, and delete notes
 - Uses `useAuth` hook for authentication
 - Uses `ErrorMessage` and `LoadingSpinner` components
+- Inline edit functionality with pre-populated form
 - Proper error handling and state management
+- UX improvements: closes create form when editing, cancels edits when creating
 
 ## API Client
 
@@ -287,8 +289,9 @@ The architecture is designed for easy testing:
 The `nginx.conf` file is configured to:
 - Serve the built static files from `/usr/share/nginx/html`
 - Handle SPA routing by serving `index.html` for all routes
-- Support any frontend prefix (handled by Vite's base configuration at build time)
+- Currently includes hardcoded `/staging` paths for staging deployments
 - Cache static assets (JS, CSS, images) for 1 year
+- **Note**: For production, the nginx configuration should be customized based on the `VITE_FRONTEND_PREFIX` used during build
 
 ### Deployment Considerations
 - **Environment Variables**: Must be set before building (for Vite) or at runtime (for React Router)

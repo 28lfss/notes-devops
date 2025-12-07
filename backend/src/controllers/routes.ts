@@ -22,6 +22,22 @@ router.post('/notes', authMiddleware, validateCreateNote, noteController.createN
 router.put('/notes/:id', authMiddleware, validateUpdateNote, noteController.updateNote);
 router.delete('/notes/:id', authMiddleware, noteController.deleteNote);
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthResponse'
+ *             example:
+ *               status: "ok"
+ */
 router.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
