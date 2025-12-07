@@ -31,10 +31,19 @@ const API_PREFIX = process.env.API_PREFIX || '/api';
 const normalizedPrefix = normalizeApiPrefix(API_PREFIX);
 
 // Swagger UI setup
-app.use(`${normalizedPrefix}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+// swagger-ui-express serves static assets at root level, but we mount it at API prefix
+// The serveFiles middleware handles serving static assets at the correct path
+const swaggerUiOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Notes API Documentation',
-}));
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+};
+
+// Mount Swagger UI - serveFiles handles static assets, setup handles the HTML page
+const swaggerUiHandler = swaggerUi.setup(swaggerSpec, swaggerUiOptions);
+app.use(`${normalizedPrefix}/api-docs`, swaggerUi.serveFiles(swaggerSpec, swaggerUiOptions), swaggerUiHandler);
 
 app.use(normalizedPrefix, routes);
 
