@@ -264,7 +264,7 @@ The Express application is configured with:
 
 The API is documented using Swagger/OpenAPI 3.0. The interactive API documentation is available at:
 
-- **Swagger UI**: `{API_PREFIX}/api-docs` (default: `/api/api-docs`)
+- **Swagger UI**: `/api-docs` (root level, independent of API prefix)
 
 ### Features
 
@@ -272,6 +272,7 @@ The API is documented using Swagger/OpenAPI 3.0. The interactive API documentati
 - **Authentication Support**: JWT Bearer token authentication is configured
 - **Complete Schema Definitions**: All request/response schemas are documented
 - **Error Responses**: All possible error responses are documented
+- **Relative Server URLs**: Uses relative paths for compatibility with reverse proxies (nginx, ALB)
 
 ### Configuration
 
@@ -279,14 +280,21 @@ Swagger configuration is located in `src/config/swagger.ts`:
 - OpenAPI 3.0.0 specification
 - All schemas defined in `components/schemas`
 - JWT Bearer authentication scheme configured
+- Server URL uses relative path (works with nginx proxy and ALB)
 - Documentation annotations in controller files using JSDoc `@swagger` comments
 
 ### Usage
 
-1. Start the backend server
-2. Navigate to `http://localhost:3000/api/api-docs` (or your configured `API_PREFIX`)
+**Local Development (Docker):**
+1. Start all services: `docker compose -f infra/docker-compose.dev.yml up --build`
+2. Navigate to `http://localhost:8080/api-docs` (through nginx proxy)
 3. Use the "Authorize" button to add your JWT token for protected endpoints
 4. Test endpoints directly from the Swagger UI
+
+**Direct Backend Access:**
+- Navigate to `http://localhost:3000/api-docs` (if backend port is exposed)
+
+**Note**: Swagger UI is mounted at `/api-docs` (root level) and is independent of the `API_PREFIX` environment variable. This allows it to work consistently across different deployment configurations.
 
 ## Error Responses
 
@@ -374,7 +382,7 @@ The `Dependencies` class in `config/dependencies.ts` provides a singleton factor
 - **Maintainability**: Easy to understand and modify
 - **Testability**: Designed for easy testing
 - **Scalability**: Can grow without major refactoring
-- **API Documentation**: Swagger/OpenAPI documentation available at `{API_PREFIX}/api-docs`
+- **API Documentation**: Swagger/OpenAPI documentation available at `/api-docs` (root level, independent of API prefix)
 - **Configuration**: Supports flexible environment-based configuration
 - **Security**: JWT authentication, password hashing, input validation
 - **Error Handling**: Comprehensive error handling with development mode support
