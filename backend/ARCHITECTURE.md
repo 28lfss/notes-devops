@@ -264,7 +264,7 @@ The Express application is configured with:
 
 The API is documented using Swagger/OpenAPI 3.0. The interactive API documentation is available at:
 
-- **Swagger UI**: `/api-docs` (root level, independent of API prefix)
+- **Swagger UI**: `{API_PREFIX}/api-docs` (default: `/api/api-docs`, staging: `/staging/api/api-docs`)
 
 ### Features
 
@@ -287,14 +287,17 @@ Swagger configuration is located in `src/config/swagger.ts`:
 
 **Local Development (Docker):**
 1. Start all services: `docker compose -f infra/docker-compose.dev.yml up --build`
-2. Navigate to `http://localhost:8080/api-docs` (through nginx proxy)
+2. Navigate to `http://localhost:8080/api/api-docs` (through nginx proxy, or directly at `http://localhost:3000/api/api-docs`)
 3. Use the "Authorize" button to add your JWT token for protected endpoints
 4. Test endpoints directly from the Swagger UI
 
-**Direct Backend Access:**
-- Navigate to `http://localhost:3000/api-docs` (if backend port is exposed)
+**AWS Staging:**
+- Navigate to `https://your-alb.amazonaws.com/staging/api/api-docs`
 
-**Note**: Swagger UI is mounted at `/api-docs` (root level) and is independent of the `API_PREFIX` environment variable. This allows it to work consistently across different deployment configurations.
+**AWS Production:**
+- Navigate to `https://your-alb.amazonaws.com/api/api-docs`
+
+**Note**: Swagger UI is mounted under the `API_PREFIX` path to ensure compatibility with ALB routing in AWS. In staging, set `API_PREFIX=/staging/api` to make Swagger accessible at `/staging/api/api-docs`.
 
 ## Error Responses
 
@@ -382,7 +385,7 @@ The `Dependencies` class in `config/dependencies.ts` provides a singleton factor
 - **Maintainability**: Easy to understand and modify
 - **Testability**: Designed for easy testing
 - **Scalability**: Can grow without major refactoring
-- **API Documentation**: Swagger/OpenAPI documentation available at `/api-docs` (root level, independent of API prefix)
+- **API Documentation**: Swagger/OpenAPI documentation available at `{API_PREFIX}/api-docs`
 - **Configuration**: Supports flexible environment-based configuration
 - **Security**: JWT authentication, password hashing, input validation
 - **Error Handling**: Comprehensive error handling with development mode support

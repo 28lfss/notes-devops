@@ -30,7 +30,7 @@ const normalizeApiPrefix = (prefix: string): string => {
 const API_PREFIX = process.env.API_PREFIX || '/api';
 const normalizedPrefix = normalizeApiPrefix(API_PREFIX);
 
-// Swagger UI setup - mounted at root level, independent of API prefix
+// Swagger UI setup - mounted under API prefix for AWS compatibility
 const swaggerUiOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Notes API Documentation',
@@ -39,8 +39,9 @@ const swaggerUiOptions = {
   },
 };
 
-// Mount Swagger UI at /api-docs (root level, not under API prefix)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+// Mount Swagger UI under API prefix (e.g., /api/api-docs or /staging/api/api-docs)
+// This ensures it works with ALB routing in AWS (routes /staging/api* to backend)
+app.use(`${normalizedPrefix}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
 app.use(normalizedPrefix, routes);
 
