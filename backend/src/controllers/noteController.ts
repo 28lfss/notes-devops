@@ -13,6 +13,14 @@ export class NoteController {
    *     tags: [Notes]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         required: false
+   *         schema:
+   *           type: string
+   *         description: Search term to filter notes by title or content (case-insensitive)
+   *         example: "meeting"
    *     responses:
    *       200:
    *         description: List of user's notes
@@ -40,7 +48,8 @@ export class NoteController {
    */
   listNotes = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.userId;
-    const notes = await this.noteService.listNotes(userId);
+    const search = req.query.search as string | undefined;
+    const notes = await this.noteService.listNotes(userId, search);
     res.status(200).json(notes);
   });
 

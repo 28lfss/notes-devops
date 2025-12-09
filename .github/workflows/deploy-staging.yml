@@ -21,7 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # precisamos de pelo menos 2 commits para comparar
           fetch-depth: 2
 
       - name: Detect changes

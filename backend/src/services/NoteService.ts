@@ -5,8 +5,8 @@ import { NotFoundError, ForbiddenError } from '../domain/errors';
 export class NoteService {
   constructor(private noteRepository: INoteRepository) {}
 
-  async listNotes(userId: string): Promise<Note[]> {
-    return this.noteRepository.findByUserId(userId);
+  async listNotes(userId: string, search?: string): Promise<Note[]> {
+    return this.noteRepository.findByUserId(userId, search);
   }
 
   async getNoteById(id: string, userId: string): Promise<Note> {
