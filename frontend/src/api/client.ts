@@ -112,8 +112,11 @@ export const api = {
     return getAuthToken() !== null;
   },
 
-  async getNotes(): Promise<Note[]> {
-    const response = await fetchWithAuth('/notes');
+  async getNotes(search?: string): Promise<Note[]> {
+    const url = search && search.trim()
+      ? `/notes?search=${encodeURIComponent(search.trim())}`
+      : '/notes';
+    const response = await fetchWithAuth(url);
     return response.json();
   },
 

@@ -21,12 +21,13 @@ export const NotesPage = () => {
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const loadNotes = useCallback(async () => {
+  const loadNotes = useCallback(async (search?: string) => {
     try {
       setLoading(true);
       setError('');
-      const fetchedNotes = await api.getNotes();
+      const fetchedNotes = await api.getNotes(search);
       setNotes(fetchedNotes);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load notes');
@@ -36,8 +37,8 @@ export const NotesPage = () => {
   }, []);
 
   useEffect(() => {
-    loadNotes();
-  }, [loadNotes]);
+    loadNotes(searchTerm);
+  }, [loadNotes, searchTerm]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,7 +50,7 @@ export const NotesPage = () => {
       setTitle('');
       setContent('');
       setShowForm(false);
-      await loadNotes();
+      await loadNotes(searchTerm);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create note');
     } finally {
@@ -65,7 +66,7 @@ export const NotesPage = () => {
     try {
       setError('');
       await api.deleteNote(id);
-      await loadNotes();
+      await loadNotes(searchTerm);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to delete note');
     }
@@ -96,7 +97,7 @@ export const NotesPage = () => {
       setEditingNoteId(null);
       setEditTitle('');
       setEditContent('');
-      await loadNotes();
+      await loadNotes(searchTerm);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to update note');
     } finally {
@@ -129,6 +130,16 @@ export const NotesPage = () => {
         >
           {showForm ? 'Cancel' : 'New Note'}
         </Button>
+      </div>
+
+      <div className="mb-6">
+        <Input
+          label="Search Notes"
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by title or content..."
+        />
       </div>
 
       <ErrorMessage message={error} />
@@ -172,7 +183,11 @@ export const NotesPage = () => {
 
       {notes.length === 0 ? (
         <div className="text-center py-8 bg-white rounded-lg shadow">
-          <p className="text-gray-600">No notes yet. Create your first note!</p>
+          <p className="text-gray-600">
+            {searchTerm
+              ? `No notes found matching "${searchTerm}".`
+              : 'No notes yet. Create your first note!'}
+          </p>
         </div>
       ) : (
         <div className="grid gap-4">

@@ -3,9 +3,19 @@ import { Note, CreateNoteInput, UpdateNoteInput } from '../domain/Note';
 import { INoteRepository } from './interfaces';
 
 export class NoteRepository implements INoteRepository {
-  async findByUserId(userId: string): Promise<Note[]> {
+  async findByUserId(userId: string, search?: string): Promise<Note[]> {
+    const where: Parameters<typeof prisma.note.findMany>[0]['where'] = { userId };
+
+    if (search && search.trim().length > 0) {
+      const searchTerm = search.trim();
+      where.OR = [
+        { title: { contains: searchTerm, mode: 'insensitive' } },
+        { content: { contains: searchTerm, mode: 'insensitive' } },
+      ];
+    }
+
     const notes = await prisma.note.findMany({
-      where: { userId },
+      where,
       orderBy: { createdAt: 'desc' },
     });
     return notes;
