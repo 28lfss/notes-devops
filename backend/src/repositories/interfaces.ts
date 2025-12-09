@@ -8,7 +8,7 @@ export interface IUserRepository {
 }
 
 export interface INoteRepository {
-  findByUserId(userId: string): Promise<Note[]>;
+  findByUserId(userId: string, search?: string): Promise<Note[]>;
   findById(id: string): Promise<Note | null>;
   create(input: CreateNoteInput): Promise<Note>;
   update(id: string, input: UpdateNoteInput): Promise<Note>;
